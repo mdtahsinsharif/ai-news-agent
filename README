@@ -1,0 +1,4 @@
+source .venv/bin/activate
+psql -d postgres
+python test_pipeline.py
+streamlit run app.py

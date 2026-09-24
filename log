@@ -1,0 +1,86 @@
+
+Fetching BBC World...
+Found 27 articles
+
+Fetching Guardian World...
+Found 45 articles
+
+Fetching Al Jazeera...
+Found 25 articles
+
+Fetching Deutsche Welle...
+Found 138 articles
+
+Fetching Euronews...
+Found 50 articles
+
+Fetching France 24...
+Found 30 articles
+
+Fetching BBC Politics...
+Found 61 articles
+
+Fetching NPR Politics...
+Found 10 articles
+
+Fetching Guardian Politics...
+Found 21 articles
+
+Fetching Politico...
+Found 30 articles
+
+Fetching CBC Canada...
+Traceback (most recent call last):
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/test_pipeline.py", line 98, in <module>
+    process_news()
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/test_pipeline.py", line 20, in process_news
+    articles = fetch_all_sources()
+               ^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/ingestion/fetch_all.py", line 31, in fetch_all_sources
+    articles = fetch_feed(
+               ^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/ingestion/rss.py", line 7, in fetch_feed
+    feed = feedparser.parse(url)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/.venv/lib/python3.11/site-packages/feedparser/api.py", line 216, in parse
+    data = _open_resource(url_file_stream_or_string, etag, modified, agent, referrer, handlers, request_headers, result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/.venv/lib/python3.11/site-packages/feedparser/api.py", line 115, in _open_resource
+    return http.get(url_file_stream_or_string, etag, modified, agent, referrer, handlers, request_headers, result)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/Desktop/Tahsin/sreRepo/ai-news-agent/.venv/lib/python3.11/site-packages/feedparser/http.py", line 171, in get
+    f = opener.open(request)
+        ^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/urllib/request.py", line 1391, in https_open
+    return self.do_open(http.client.HTTPSConnection, req,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/urllib/request.py", line 1352, in do_open
+    r = h.getresponse()
+        ^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/http/client.py", line 1375, in getresponse
+    response.begin()
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/http/client.py", line 318, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/http/client.py", line 279, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/socket.py", line 706, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/ssl.py", line 1278, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/mdtahsinsharif/anaconda3/lib/python3.11/ssl.py", line 1134, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+KeyboardInterrupt

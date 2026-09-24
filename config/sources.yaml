@@ -1,0 +1,225 @@
+sources:
+
+  # ============================================================
+  # WORLD
+  # ============================================================
+
+  #- name: BBC World
+  #  type: rss
+  #  category: World
+  #  url: "https://feeds.bbci.co.uk/news/world/rss.xml"
+
+  #- name: Guardian World
+  #  type: rss
+  #  category: World
+  #  url: "https://www.theguardian.com/world/rss"
+
+  - name: Al Jazeera
+    type: rss
+    category: World
+    url: "https://www.aljazeera.com/xml/rss/all.xml"
+
+  #- name: Deutsche Welle
+  #  type: rss
+  #  category: World
+  #  url: "https://rss.dw.com/xml/rss-en-all"
+
+  - name: Euronews
+    type: rss
+    category: world
+    url: "https://www.euronews.com/rss"
+
+  #- name: France 24
+  #  type: rss
+  #  category: world
+  #  url: "https://www.france24.com/en/france/rss"
+
+
+  # ============================================================
+  # POLITICS
+  # ============================================================
+
+  - name: BBC Politics
+    type: rss
+    category: Politics
+    url: "https://feeds.bbci.co.uk/news/politics/rss.xml"
+
+  - name: NPR Politics
+    type: rss
+    category: Politics
+    url: "https://feeds.npr.org/1014/rss.xml"
+
+  - name: Guardian Politics
+    type: rss
+    category: Politics
+    url: "https://www.theguardian.com/politics/rss"
+
+  - name: Politico
+    type: rss
+    category: Politics
+    url: "https://rss.politico.com/politics-news.xml"
+
+
+  # ============================================================
+  # CANADA
+  # ============================================================
+
+  #- name: CBC Canada
+  #  type: rss
+  #  category: canada
+  #  url: "https://www.cbc.ca/webfeed/rss/rss-canada"
+
+  #- name: CBC Politics
+  #  type: rss
+  #  category: canada
+  #  url: "https://www.cbc.ca/webfeed/rss/rss-politics"
+
+  #- name: CBC News Toronto
+  #  type: rss
+  #  category: toronto
+  #  url: "https://www.cbc.ca/webfeed/rss/rss-canada-toronto"
+
+
+  # ============================================================
+  # TECHNOLOGY
+  # ============================================================
+
+  - name: TechCrunch
+    type: rss
+    category: technology
+    url: "https://techcrunch.com/feed/"
+
+  - name: Ars Technica
+    type: rss
+    category: Technology
+    url: "https://feeds.arstechnica.com/arstechnica/index"
+
+  #- name: Engadget
+  #  type: rss
+  #  category: technology
+  #  url: "https://www.engadget.com/rss.xml"
+
+  - name: Wired
+    type: rss
+    category: Technology
+    url: "https://www.wired.com/feed/rss"
+
+  #- name: The Verge
+  #  type: rss
+  #  category: technology
+  #  url: "https://www.theverge.com/rss/index.xml"
+
+  #- name: Guardian Technology
+  #  type: rss
+  #  category: technology
+  #  url: "https://www.theguardian.com/technology/rss"
+
+  #- name: Hacker News
+  #  type: rss
+  #  category: technology
+  #  url: "https://news.ycombinator.com/rss"
+
+
+  # ============================================================
+  # BUSINESS
+  # ============================================================
+
+  - name: BBC Business
+    type: rss
+    category: Business
+    url: "https://feeds.bbci.co.uk/news/business/rss.xml"
+
+  #- name: NPR Business
+  #  type: rss
+  #  category: business
+  #  url: "https://feeds.npr.org/1006/rss.xml"
+
+  #- name: Guardian Business
+  #  type: rss
+  #  category: business
+  #  url: "https://www.theguardian.com/business/rss"
+
+  #- name: CNBC
+  #  type: rss
+  #  category: business
+  #  url: "https://www.cnbc.com/id/100003114/device/rss/rss.html"
+
+
+  # ============================================================
+  # SCIENCE
+  # ============================================================
+
+  #- name: BBC Science
+  #  type: rss
+  #  category: science
+  #  url: "https://feeds.bbci.co.uk/news/science_and_environment/rss.xml"
+
+  #- name: Ars Technica Science
+  #  type: rss
+  #  category: science
+  #  url: "https://feeds.arstechnica.com/arstechnica/science"
+
+  - name: New Scientist
+    type: rss
+    category: Science
+    url: "https://www.newscientist.com/feed/home/"
+
+
+  # ============================================================
+  # HEALTH
+  # ============================================================
+
+  #- name: BBC Health
+  #  type: rss
+  #  category: health
+  #  url: "https://feeds.bbci.co.uk/news/health/rss.xml"
+
+  - name: NPR Health
+    type: rss
+    category: Health
+    url: "https://feeds.npr.org/1128/rss.xml"
+
+  #- name: Guardian Health
+  #  type: rss
+  #  category: health
+  #  url: "https://www.theguardian.com/society/health/rss"
+
+
+  # ============================================================
+  # SPORTS
+  # ============================================================
+
+  #- name: BBC Sport
+  #  type: rss
+  #  category: sports
+  #  url: "https://feeds.bbci.co.uk/sport/rss.xml"
+
+  #- name: Guardian Sport
+  #  type: rss
+  #  category: sports
+  #  url: "https://www.theguardian.com/sport/rss"
+
+  - name: ESPN
+    type: rss
+    category: Sports
+    url: "https://www.espn.com/espn/rss/news"
+
+
+  # ============================================================
+  # ENTERTAINMENT
+  # ============================================================
+
+  #- name: BBC Entertainment
+  #  type: rss
+  #  category: entertainment
+  #  url: "https://feeds.bbci.co.uk/news/entertainment_and_arts/rss.xml"
+
+  #- name: Guardian Culture
+  #  type: rss
+  #  category: entertainment
+  #  url: "https://www.theguardian.com/culture/rss"
+
+  - name: NPR Arts & Culture
+    type: rss
+    category: Entertainment
+    url: "https://feeds.npr.org/1008/rss.xml"
