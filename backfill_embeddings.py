@@ -22,6 +22,34 @@ from database.repository import update_article_embedding
 
 BATCH_SIZE = 100
 
+# The free tier allows 100 embeddings per minute, so on a
+# rate-limit error wait out the window and retry the batch.
+MAX_RETRIES = 5
+RETRY_DELAY_SECONDS = 65
+
+
+def embed_with_retry(texts):
+
+    for attempt in range(1, MAX_RETRIES + 1):
+
+        try:
+            return generate_embeddings(texts)
+
+        except Exception as e:
+
+            # The daily quota won't reset for hours, so
+            # retrying is pointless.
+            if "PerDay" in str(e) or attempt == MAX_RETRIES:
+                raise
+
+            print(
+                f"Attempt {attempt} failed "
+                f"({str(e)[:80]}), retrying in "
+                f"{RETRY_DELAY_SECONDS}s..."
+            )
+
+            time.sleep(RETRY_DELAY_SECONDS)
+
 
 def get_articles_missing_embeddings(limit=None):
 
@@ -66,14 +94,19 @@ def backfill(limit=None):
         batch = articles[start:start + BATCH_SIZE]
 
         try:
-            embeddings = generate_embeddings(
+            embeddings = embed_with_retry(
                 [article.title for article in batch]
             )
 
         except Exception as e:
             print(f"Batch at {start} failed: {e}")
             failed += len(batch)
-            time.sleep(5)
+
+            if "PerDay" in str(e):
+                print("Daily quota exhausted; rerun later.")
+                failed = len(articles) - len(embedded_ids)
+                break
+
             continue
 
         for article, embedding in zip(batch, embeddings):
