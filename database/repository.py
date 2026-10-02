@@ -294,8 +294,7 @@ def update_story_embedding(
         SET
             embedding = CAST(
                 :embedding AS vector
-            ),
-            updated_at = NOW()
+            )
         WHERE id = :story_id
     """)
 

@@ -19,3 +19,16 @@ def generate_embedding(text):
     )
 
     return result.embeddings[0].values
+
+
+def generate_embeddings(texts):
+
+    result = client.models.embed_content(
+        model="gemini-embedding-001",
+        contents=texts
+    )
+
+    return [
+        embedding.values
+        for embedding in result.embeddings
+    ]
