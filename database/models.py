@@ -2,6 +2,8 @@ from datetime import datetime
 
 from pgvector.sqlalchemy import Vector
 
+from ai.embeddings import EMBEDDING_DIMENSIONS
+
 from sqlalchemy import (
     String,
     Text,
@@ -67,7 +69,7 @@ class Article(Base):
     )
 
     embedding: Mapped[list | None] = mapped_column(
-        Vector(3072),
+        Vector(EMBEDDING_DIMENSIONS),
     )
 
 class Story(Base):
@@ -97,14 +99,17 @@ class Story(Base):
         default=datetime.utcnow
     )
 
+    # Indexed because the clustering window and the "today"
+    # view filter on it.
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,
         onupdate=datetime.utcnow,
+        index=True,
     )
 
     embedding: Mapped[list | None] = mapped_column(
-        Vector(3072)
+        Vector(EMBEDDING_DIMENSIONS)
     )
 
 class StoryArticle(Base):
@@ -123,3 +128,24 @@ class StoryArticle(Base):
 
     similarity: Mapped[float]
     
+
+class StoryMergeRejection(Base):
+    """
+    Story pairs the LLM judged to be different events, so
+    the merge step doesn't ask about them again.
+    """
+
+    __tablename__ = "story_merge_rejections"
+
+    story_a: Mapped[int] = mapped_column(
+        primary_key=True,
+    )
+
+    story_b: Mapped[int] = mapped_column(
+        primary_key=True,
+    )
+
+    checked_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.utcnow,
+    )

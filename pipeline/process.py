@@ -7,12 +7,68 @@ from ingestion.article_service import (
 )
 
 from ai.embeddings import (
+    build_embedding_text,
     generate_embedding,
+    is_daily_quota_error,
+)
+
+from database.repository import (
+    get_unclustered_articles,
+    update_article_embedding,
 )
 
 from ai.clustering import (
     assign_article_to_story,
 )
+
+from ai.same_story import SameStoryChecker
+
+from ai.story_merge import merge_duplicate_stories
+
+
+def cluster_article(article, checker):
+
+    # ---------------------------------------------
+    # Generate embedding (reuse one saved earlier)
+    # ---------------------------------------------
+
+    if article.embedding is None:
+
+        embedding = generate_embedding(
+            build_embedding_text(
+                article.title,
+                article.description,
+            )
+        )
+
+        update_article_embedding(
+            article_id=article.id,
+            embedding=embedding,
+        )
+
+    else:
+
+        embedding = [
+            float(value)
+            for value in article.embedding
+        ]
+
+    # ---------------------------------------------
+    # Cluster
+    # ---------------------------------------------
+
+    clustering_article = {
+        "id": article.id,
+        "title": article.title,
+        "description": article.description,
+        "category": article.category,
+    }
+
+    return assign_article_to_story(
+        article=clustering_article,
+        embedding=embedding,
+        checker=checker,
+    )
 
 
 def process_news():
@@ -23,14 +79,14 @@ def process_news():
         f"\nFetched {len(articles)} articles"
     )
 
-    processed = 0
+    # ---------------------------------------------
+    # Save only new articles
+    # ---------------------------------------------
+
+    saved = 0
     skipped = 0
 
     for article_data in articles:
-
-        # ---------------------------------------------
-        # Save only new articles
-        # ---------------------------------------------
 
         article = save_article_if_new(
             article_data
@@ -42,28 +98,50 @@ def process_news():
 
             continue
 
-        # ---------------------------------------------
-        # Generate embedding
-        # ---------------------------------------------
+        saved += 1
 
-        embedding = generate_embedding(
-            article.title
-        )
+    # ---------------------------------------------
+    # Cluster every article without a story,
+    # including ones left over from failed runs
+    # ---------------------------------------------
 
-        # ---------------------------------------------
-        # Cluster
-        # ---------------------------------------------
+    pending = get_unclustered_articles()
 
-        clustering_article = {
-            "id": article.id,
-            "title": article.title,
-            "category": article.category,
-        }
+    print(
+        f"\nArticles to cluster: {len(pending)}"
+    )
 
-        result = assign_article_to_story(
-            article=clustering_article,
-            embedding=embedding,
-        )
+    checker = SameStoryChecker()
+
+    processed = 0
+    failed = 0
+
+    for article in pending:
+
+        try:
+
+            result = cluster_article(article, checker)
+
+        except Exception as e:
+
+            if is_daily_quota_error(e):
+
+                print(
+                    "\nDaily embedding quota exhausted; "
+                    "remaining articles will be "
+                    "clustered on the next run."
+                )
+
+                break
+
+            print(
+                f"\nFailed to cluster article "
+                f"{article.id}: {e}"
+            )
+
+            failed += 1
+
+            continue
 
         print(
             f"\n{article.title}"
@@ -83,14 +161,42 @@ def process_news():
 
         processed += 1
 
+    # ---------------------------------------------
+    # Merge stories that turned out to be duplicates
+    # ---------------------------------------------
+
+    print("\nMerging duplicate stories...")
+
+    merged = merge_duplicate_stories(checker)
+
     print("\n====================")
 
     print(
-        f"Processed: {processed}"
+        f"Saved: {saved}"
     )
 
     print(
         f"Skipped: {skipped}"
+    )
+
+    print(
+        f"Clustered: {processed}"
+    )
+
+    print(
+        f"Failed: {failed}"
+    )
+
+    print(
+        f"Remaining: {len(pending) - processed - failed}"
+    )
+
+    print(
+        f"Stories merged: {merged}"
+    )
+
+    print(
+        f"LLM checks: {checker.calls}"
     )
 
     print("====================")
