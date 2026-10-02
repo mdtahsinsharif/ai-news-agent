@@ -7,6 +7,7 @@ from ingestion.article_service import (
 )
 
 from ai.embeddings import (
+    build_embedding_text,
     generate_embedding,
     is_daily_quota_error,
 )
@@ -20,8 +21,12 @@ from ai.clustering import (
     assign_article_to_story,
 )
 
+from ai.same_story import SameStoryChecker
 
-def cluster_article(article):
+from ai.story_merge import merge_duplicate_stories
+
+
+def cluster_article(article, checker):
 
     # ---------------------------------------------
     # Generate embedding (reuse one saved earlier)
@@ -30,7 +35,10 @@ def cluster_article(article):
     if article.embedding is None:
 
         embedding = generate_embedding(
-            article.title
+            build_embedding_text(
+                article.title,
+                article.description,
+            )
         )
 
         update_article_embedding(
@@ -52,12 +60,14 @@ def cluster_article(article):
     clustering_article = {
         "id": article.id,
         "title": article.title,
+        "description": article.description,
         "category": article.category,
     }
 
     return assign_article_to_story(
         article=clustering_article,
         embedding=embedding,
+        checker=checker,
     )
 
 
@@ -101,6 +111,8 @@ def process_news():
         f"\nArticles to cluster: {len(pending)}"
     )
 
+    checker = SameStoryChecker()
+
     processed = 0
     failed = 0
 
@@ -108,7 +120,7 @@ def process_news():
 
         try:
 
-            result = cluster_article(article)
+            result = cluster_article(article, checker)
 
         except Exception as e:
 
@@ -149,6 +161,14 @@ def process_news():
 
         processed += 1
 
+    # ---------------------------------------------
+    # Merge stories that turned out to be duplicates
+    # ---------------------------------------------
+
+    print("\nMerging duplicate stories...")
+
+    merged = merge_duplicate_stories(checker)
+
     print("\n====================")
 
     print(
@@ -169,6 +189,14 @@ def process_news():
 
     print(
         f"Remaining: {len(pending) - processed - failed}"
+    )
+
+    print(
+        f"Stories merged: {merged}"
+    )
+
+    print(
+        f"LLM checks: {checker.calls}"
     )
 
     print("====================")

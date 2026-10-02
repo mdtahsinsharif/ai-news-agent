@@ -359,3 +359,163 @@ def update_story_summary(
         session.commit()
 
 
+
+def get_story_titles(
+    story_id,
+    limit=3,
+):
+    """
+    Get the most recent article titles in a story.
+    """
+
+    query = (
+        select(Article.title)
+        .join(
+            StoryArticle,
+            Article.id == StoryArticle.article_id,
+        )
+        .where(StoryArticle.story_id == story_id)
+        .order_by(Article.published_at.desc().nulls_last())
+        .limit(limit)
+    )
+
+    with SessionLocal() as session:
+
+        return list(session.execute(query).scalars())
+
+
+def get_merge_candidates(
+    min_similarity,
+    hours=48,
+):
+    """
+    Find pairs of recent stories whose embeddings are
+    similar enough to be duplicates, most similar first.
+    Pairs already judged different are excluded.
+    """
+
+    query = text("""
+        WITH recent AS (
+            SELECT
+                s.id,
+                s.embedding,
+                COUNT(sa.article_id) AS article_count
+            FROM stories s
+            JOIN story_articles sa
+                ON s.id = sa.story_id
+            WHERE s.embedding IS NOT NULL
+              AND s.updated_at >=
+                  NOW() - (:hours * INTERVAL '1 hour')
+            GROUP BY s.id
+        )
+
+        SELECT
+            a.id AS story_a,
+            b.id AS story_b,
+            a.article_count AS count_a,
+            b.article_count AS count_b,
+            1 - (a.embedding <=> b.embedding) AS similarity
+
+        FROM recent a
+        JOIN recent b
+            ON a.id < b.id
+
+        WHERE 1 - (a.embedding <=> b.embedding)
+              >= :min_similarity
+
+          AND NOT EXISTS (
+              SELECT 1
+              FROM story_merge_rejections r
+              WHERE r.story_a = a.id
+                AND r.story_b = b.id
+          )
+
+        ORDER BY similarity DESC
+    """)
+
+    with SessionLocal() as session:
+
+        result = session.execute(
+            query,
+            {
+                "min_similarity": min_similarity,
+                "hours": hours,
+            },
+        )
+
+        return result.mappings().all()
+
+
+def merge_stories(
+    keep_id,
+    drop_id,
+):
+    """
+    Move every article from one story into another and
+    delete the emptied story.
+    """
+
+    params = {
+        "keep_id": keep_id,
+        "drop_id": drop_id,
+    }
+
+    with SessionLocal() as session:
+
+        session.execute(
+            text("""
+                UPDATE story_articles
+                SET story_id = :keep_id
+                WHERE story_id = :drop_id
+            """),
+            params,
+        )
+
+        session.execute(
+            text("""
+                UPDATE stories k
+                SET
+                    created_at = LEAST(k.created_at, d.created_at),
+                    updated_at = GREATEST(k.updated_at, d.updated_at)
+                FROM stories d
+                WHERE k.id = :keep_id
+                  AND d.id = :drop_id
+            """),
+            params,
+        )
+
+        session.execute(
+            text("""
+                DELETE FROM stories
+                WHERE id = :drop_id
+            """),
+            params,
+        )
+
+        session.commit()
+
+
+def record_merge_rejection(
+    story_a,
+    story_b,
+):
+
+    query = text("""
+        INSERT INTO story_merge_rejections
+            (story_a, story_b, checked_at)
+        VALUES
+            (:story_a, :story_b, NOW())
+        ON CONFLICT DO NOTHING
+    """)
+
+    with SessionLocal() as session:
+
+        session.execute(
+            query,
+            {
+                "story_a": min(story_a, story_b),
+                "story_b": max(story_a, story_b),
+            },
+        )
+
+        session.commit()

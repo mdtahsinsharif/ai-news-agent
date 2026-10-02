@@ -4,16 +4,51 @@ from database.repository import (
     attach_article_to_story,
 )
 
+from ai.same_story import (
+    describe_article,
+    describe_story,
+)
+
 from ai.story_embedding import refresh_story_embedding
 
 
-SIMILARITY_THRESHOLD = 0.80
+# Above this, the article is attached without asking the LLM.
+AUTO_ATTACH_THRESHOLD = 0.85
+
+# Below this, the article always starts a new story.
+CANDIDATE_THRESHOLD = 0.72
+
+# Used in the gray zone when the LLM can't be asked.
+FALLBACK_THRESHOLD = 0.80
+
+
+def should_attach(article, story, similarity, checker):
+
+    if similarity >= AUTO_ATTACH_THRESHOLD:
+        return True
+
+    if similarity < CANDIDATE_THRESHOLD:
+        return False
+
+    verdict = None
+
+    if checker is not None:
+
+        verdict = checker.check(
+            describe_article(article),
+            describe_story(story["id"]),
+        )
+
+    if verdict is None:
+        return similarity >= FALLBACK_THRESHOLD
+
+    return verdict
 
 
 def assign_article_to_story(
     article,
     embedding,
-    threshold=SIMILARITY_THRESHOLD,
+    checker=None,
 ):
 
     similar_stories = find_similar_stories(
@@ -40,7 +75,12 @@ def assign_article_to_story(
         best_story["similarity"]
     )
 
-    if similarity >= threshold:
+    if should_attach(
+        article,
+        best_story,
+        similarity,
+        checker,
+    ):
 
         attach_article_to_story(
             article_id=article["id"],
