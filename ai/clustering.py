@@ -48,6 +48,10 @@ def assign_article_to_story(
             similarity=similarity,
         )
 
+        refresh_story_embedding(
+            best_story["id"]
+        )
+
         return {
             "action": "attached",
             "story_id": best_story["id"],

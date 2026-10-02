@@ -10,6 +10,10 @@ from ai.embeddings import (
     generate_embedding,
 )
 
+from database.repository import (
+    update_article_embedding,
+)
+
 from ai.clustering import (
     assign_article_to_story,
 )
@@ -48,6 +52,11 @@ def process_news():
 
         embedding = generate_embedding(
             article.title
+        )
+
+        update_article_embedding(
+            article_id=article.id,
+            embedding=embedding,
         )
 
         # ---------------------------------------------

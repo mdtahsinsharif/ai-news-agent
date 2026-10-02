@@ -48,6 +48,36 @@ def save_article(data):
         return article
 
 
+def update_article_embedding(
+    article_id,
+    embedding,
+):
+    """
+    Store the embedding generated for an article.
+    """
+
+    query = text("""
+        UPDATE articles
+        SET
+            embedding = CAST(
+                :embedding AS vector
+            )
+        WHERE id = :article_id
+    """)
+
+    with SessionLocal() as session:
+
+        session.execute(
+            query,
+            {
+                "article_id": article_id,
+                "embedding": str(embedding),
+            },
+        )
+
+        session.commit()
+
+
 # ============================================================
 # STORY FUNCTIONS
 # ============================================================
@@ -212,6 +242,12 @@ def attach_article_to_story(
 
         session.add(relationship)
 
+        # Keep the story active for clustering and the
+        # "today" view while it keeps receiving articles.
+        story = session.get(Story, story_id)
+
+        story.updated_at = datetime.utcnow()
+
         session.commit()
 
 from sqlalchemy import text
@@ -224,29 +260,25 @@ def get_story_article_embeddings(story_id):
     Get embeddings for all articles belonging to a story.
     """
 
-    query = text("""
-        SELECT
-            a.embedding
-        FROM articles a
-        JOIN story_articles sa
-            ON a.id = sa.article_id
-        WHERE sa.story_id = :story_id
-          AND a.embedding IS NOT NULL
-    """)
+    # Use the ORM so pgvector decodes embeddings into
+    # arrays; a raw text() query returns them as strings.
+    query = (
+        select(Article.embedding)
+        .join(
+            StoryArticle,
+            Article.id == StoryArticle.article_id,
+        )
+        .where(
+            StoryArticle.story_id == story_id,
+            Article.embedding.is_not(None),
+        )
+    )
 
     with SessionLocal() as session:
 
-        result = session.execute(
-            query,
-            {
-                "story_id": story_id,
-            },
+        return list(
+            session.execute(query).scalars()
         )
-
-        return [
-            row[0]
-            for row in result.fetchall()
-        ]
 
 
 def update_story_embedding(
