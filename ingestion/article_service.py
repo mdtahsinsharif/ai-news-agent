@@ -10,7 +10,15 @@ def save_article_if_new(article_data):
     already been stored.
     """
 
-    url = article_data["url"]
+    url = article_data.get("url")
+
+    if not url or not article_data.get("title"):
+
+        print(
+            f"Skipping entry without URL or title: {url}"
+        )
+
+        return None
 
     if article_exists(url):
 

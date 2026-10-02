@@ -3,7 +3,6 @@ import time
 
 from pipeline.process import process_news
 
-process_news()
 while True:
     try:
         print("Starting news pipeline...")

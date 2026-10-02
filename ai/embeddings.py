@@ -32,3 +32,12 @@ def generate_embeddings(texts):
         embedding.values
         for embedding in result.embeddings
     ]
+
+
+def is_daily_quota_error(error):
+    """
+    True when Gemini rejected the request because the
+    daily quota is used up (it won't reset for hours).
+    """
+
+    return "PerDay" in str(error)

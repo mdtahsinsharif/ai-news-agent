@@ -13,7 +13,10 @@ import time
 
 from sqlalchemy import select
 
-from ai.embeddings import generate_embeddings
+from ai.embeddings import (
+    generate_embeddings,
+    is_daily_quota_error,
+)
 from ai.story_embedding import refresh_story_embedding
 from database.connection import SessionLocal
 from database.models import Article, StoryArticle
@@ -39,7 +42,7 @@ def embed_with_retry(texts):
 
             # The daily quota won't reset for hours, so
             # retrying is pointless.
-            if "PerDay" in str(e) or attempt == MAX_RETRIES:
+            if is_daily_quota_error(e) or attempt == MAX_RETRIES:
                 raise
 
             print(
@@ -102,7 +105,7 @@ def backfill(limit=None):
             print(f"Batch at {start} failed: {e}")
             failed += len(batch)
 
-            if "PerDay" in str(e):
+            if is_daily_quota_error(e):
                 print("Daily quota exhausted; rerun later.")
                 failed = len(articles) - len(embedded_ids)
                 break

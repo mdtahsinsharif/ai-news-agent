@@ -78,6 +78,27 @@ def update_article_embedding(
         session.commit()
 
 
+def get_unclustered_articles():
+    """
+    Get articles that have not been assigned to a story,
+    e.g. because embedding failed on a previous run.
+    """
+
+    query = (
+        select(Article)
+        .where(
+            ~select(StoryArticle.article_id)
+            .where(StoryArticle.article_id == Article.id)
+            .exists()
+        )
+        .order_by(Article.id)
+    )
+
+    with SessionLocal() as session:
+
+        return list(session.execute(query).scalars())
+
+
 # ============================================================
 # STORY FUNCTIONS
 # ============================================================
