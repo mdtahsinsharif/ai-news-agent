@@ -4,6 +4,12 @@ from database.connection import SessionLocal
 
 
 def get_todays_stories():
+    """
+    Stories updated in the last 24 hours. Timestamps are
+    stored as UTC, so compare against UTC now rather than
+    the local calendar date (which empties the feed at
+    midnight and is skewed by the UTC offset).
+    """
 
     query = text("""
         SELECT
@@ -23,7 +29,8 @@ def get_todays_stories():
         JOIN story_articles sa
             ON s.id = sa.story_id
 
-        WHERE s.updated_at >= CURRENT_DATE
+        WHERE s.updated_at >=
+              (NOW() AT TIME ZONE 'UTC') - INTERVAL '24 hours'
 
         GROUP BY
             s.id

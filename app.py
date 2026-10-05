@@ -45,18 +45,18 @@ st.markdown(
 )
 
 st.title("AI News")
-st.caption("Today's news, grouped into stories.")
+st.caption("The last 24 hours of news, grouped into stories.")
 
 
 # --------------------------------------------------
-# Load today's stories
+# Load stories from the last 24 hours
 # --------------------------------------------------
 
 stories = get_todays_stories()
 
 
 if not stories:
-    st.info("No news available for today.")
+    st.info("No news in the last 24 hours.")
 
 else:
 

@@ -177,7 +177,7 @@ def find_similar_stories(
         WHERE embedding IS NOT NULL
 
           AND updated_at >=
-              NOW() - (
+              (NOW() AT TIME ZONE 'UTC') - (
                   :hours * INTERVAL '1 hour'
               )
 
@@ -341,7 +341,7 @@ def update_story_summary(
         SET
             headline = :headline,
             summary = :summary,
-            updated_at = NOW()
+            updated_at = NOW() AT TIME ZONE 'UTC'
         WHERE id = :story_id
     """)
 
@@ -405,7 +405,8 @@ def get_merge_candidates(
                 ON s.id = sa.story_id
             WHERE s.embedding IS NOT NULL
               AND s.updated_at >=
-                  NOW() - (:hours * INTERVAL '1 hour')
+                  (NOW() AT TIME ZONE 'UTC')
+                  - (:hours * INTERVAL '1 hour')
             GROUP BY s.id
         )
 
@@ -504,7 +505,7 @@ def record_merge_rejection(
         INSERT INTO story_merge_rejections
             (story_a, story_b, checked_at)
         VALUES
-            (:story_a, :story_b, NOW())
+            (:story_a, :story_b, NOW() AT TIME ZONE 'UTC')
         ON CONFLICT DO NOTHING
     """)
 
