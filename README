@@ -3,8 +3,8 @@ psql -d postgres
 python run_pipeline.py
 streamlit run app.py
 
-Schedule (launchd, hourly + at login)
--------------------------------------
+Schedule (launchd, every 6 hours + at login)
+--------------------------------------------
 Job:  ~/Library/LaunchAgents/com.mdtahsinsharif.ai-news-agent.plist
 Logs: ~/Library/Logs/ai-news-agent/pipeline.log
 

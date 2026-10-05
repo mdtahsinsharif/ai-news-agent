@@ -1,7 +1,7 @@
 """
 Run the news pipeline once and exit.
 
-Scheduled hourly by launchd; see README for the commands.
+Scheduled every 6 hours by launchd; see README for the commands.
 """
 
 from datetime import datetime
