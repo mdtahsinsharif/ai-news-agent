@@ -1,4 +1,17 @@
 source .venv/bin/activate
 psql -d postgres / ai_news
-python test_pipeline.py
+python run_pipeline.py
 streamlit run app.py
+
+Schedule (launchd, every 6 hours + at login)
+--------------------------------------------
+Job:  ~/Library/LaunchAgents/com.mdtahsinsharif.ai-news-agent.plist
+Logs: ~/Library/Logs/ai-news-agent/pipeline.log
+
+Status:  launchctl print gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
+Run now: launchctl kickstart gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
+Stop:    launchctl bootout gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
+Start:   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.mdtahsinsharif.ai-news-agent.plist
+
+Don't also run test_pipeline.py while the schedule is on: it loops
+forever and would run the pipeline twice.

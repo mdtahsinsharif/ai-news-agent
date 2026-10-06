@@ -12,14 +12,20 @@ from ai.same_story import (
 from ai.story_embedding import refresh_story_embedding
 
 
+# Calibrated on LLM-labeled article pairs (768-dim, title +
+# description, CLUSTERING): different events routinely score
+# 0.80-0.88, and only ~half of pairs at 0.91-0.94 are the
+# same event.
+
 # Above this, the article is attached without asking the LLM.
-AUTO_ATTACH_THRESHOLD = 0.85
+AUTO_ATTACH_THRESHOLD = 0.95
 
 # Below this, the article always starts a new story.
-CANDIDATE_THRESHOLD = 0.72
+CANDIDATE_THRESHOLD = 0.85
 
-# Used in the gray zone when the LLM can't be asked.
-FALLBACK_THRESHOLD = 0.80
+# Used in the gray zone when the LLM can't be asked; errs
+# toward a duplicate story over hiding news in a wrong one.
+FALLBACK_THRESHOLD = 0.93
 
 
 def should_attach(article, story, similarity, checker):

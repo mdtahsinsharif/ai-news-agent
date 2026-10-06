@@ -22,9 +22,9 @@ Usage:
 
 import argparse
 import time
-from datetime import timedelta
+from datetime import datetime, timedelta
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 
 from ai.embeddings import (
     build_embedding_text,
@@ -87,7 +87,7 @@ def get_articles_to_embed(hours=None, limit=None):
             .join(Story, Story.id == StoryArticle.story_id)
             .where(
                 Story.updated_at
-                >= func.now() - timedelta(hours=hours)
+                >= datetime.utcnow() - timedelta(hours=hours)
             )
         )
 

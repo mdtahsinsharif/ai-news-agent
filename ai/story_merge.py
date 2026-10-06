@@ -8,11 +8,13 @@ from ai.same_story import describe_story
 from ai.story_embedding import refresh_story_embedding
 
 
+# Same calibration as ai/clustering.py.
+
 # Above this, stories are merged without asking the LLM.
-AUTO_MERGE_THRESHOLD = 0.85
+AUTO_MERGE_THRESHOLD = 0.95
 
 # Pairs below this are never considered duplicates.
-CANDIDATE_THRESHOLD = 0.75
+CANDIDATE_THRESHOLD = 0.85
 
 
 def merge_duplicate_stories(checker=None):
