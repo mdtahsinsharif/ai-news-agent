@@ -3,15 +3,21 @@ psql -d postgres / ai_news
 python run_pipeline.py
 streamlit run app.py
 
-Schedule (launchd, every 6 hours + at login)
---------------------------------------------
-Job:  ~/Library/LaunchAgents/com.mdtahsinsharif.ai-news-agent.plist
-Logs: ~/Library/Logs/ai-news-agent/pipeline.log
+Schedule (every 6 hours)
+------------------------
+Run in its own terminal and leave it open:
 
-Status:  launchctl print gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
-Run now: launchctl kickstart gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
-Stop:    launchctl bootout gui/$(id -u)/com.mdtahsinsharif.ai-news-agent
-Start:   launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.mdtahsinsharif.ai-news-agent.plist
+    python -m pipeline.scheduler
 
-Don't also run test_pipeline.py while the schedule is on: it loops
-forever and would run the pipeline twice.
+It runs the pipeline immediately, then every 6 hours. If the Mac
+sleeps through a run, it runs as soon as the Mac wakes. Ctrl+C
+stops it; it doesn't survive closing the terminal, logout, or a
+restart, so start it again after those.
+
+To run it in the background instead and keep a log:
+
+    nohup python -m pipeline.scheduler >> scheduler.log 2>&1 &
+
+Stop it with: pkill -f pipeline.scheduler
+
+Only run one scheduler at a time.
