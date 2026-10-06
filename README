@@ -1,4 +1,4 @@
 source .venv/bin/activate
-psql -d postgres
+psql -d postgres / ai_news
 python test_pipeline.py
 streamlit run app.py
