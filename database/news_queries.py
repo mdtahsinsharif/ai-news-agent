@@ -63,8 +63,10 @@ def get_story_articles(story_id):
 
         WHERE sa.story_id = :story_id
 
+        -- Newest first; undated articles last so they don't
+        -- take the single link shown per story.
         ORDER BY
-            a.published_at DESC
+            a.published_at DESC NULLS LAST
     """)
 
     with SessionLocal() as session:

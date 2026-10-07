@@ -92,28 +92,26 @@ else:
 
 
         # ----------------------------------------------
-        # Source articles
+        # Source article (only the most recent one)
         # ----------------------------------------------
 
         articles = get_story_articles(
             story["id"]
         )
 
-        for article in articles:
+        if articles:
 
-            
+            article = articles[0]
+
             if article["published_at"]:
                 st.caption(
                     f"Published: {article['published_at']}"
                 )
-            
+
             st.markdown(
                 f"[{article['title']}]({article['url']}) - "
                 f"**{article['source']}**"
             )
-
-
-            st.divider()
 
 
         # ----------------------------------------------
